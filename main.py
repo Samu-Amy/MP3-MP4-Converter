@@ -53,8 +53,8 @@ def singleProgress(stream, chunk, bytes_remaining):
 
 # UI Elements
 top_frame = customtkinter.CTkFrame(window)
-option_section = customtkinter.CTkFrame(top_frame, corner_radius=0)
-info_section = customtkinter.CTkFrame(top_frame, corner_radius=0)
+option_section = customtkinter.CTkFrame(top_frame, corner_radius=0, fg_color="#2b2b2b")
+info_section = customtkinter.CTkFrame(top_frame, corner_radius=0, fg_color="#2b2b2b")
 main_frame= customtkinter.CTkFrame(window)
 
 # - Options section
@@ -92,8 +92,8 @@ top_frame.columnconfigure(1, weight=1)
 top_frame.rowconfigure(0, weight=1)
 top_frame.pack(fill="both")
 
-option_section.grid(row=0, column=0, sticky="nw")
-info_section.grid(row=0, column=1, sticky="ne")
+option_section.grid(row=0, column=0, sticky="nesw", padx=10)
+info_section.grid(row=0, column=1, sticky="nesw")
 # option_section.pack(side="left", anchor="nw", fill="both", expand=True)
 # info_section.pack(side="right", anchor="ne", fill="both", expand=True)
 
