@@ -22,7 +22,6 @@ window.title("MP3 Downloader")
 # Variables
 url = tkinter.StringVar()
 chunk_sizes = ["0.25MB", "0.5MB", "1MB", "9MB"]
-start = None
 
 
 # Functions
@@ -37,7 +36,7 @@ def download():
     # TODO: riattiva try and catch
     # try:
     yt_link = download_link_entry.get()
-    yt_object = YouTube(yt_link, on_progress_callback=downloadProgress, on_complete_callback=downloadCompleted)
+    yt_object = YouTube(yt_link, on_progress_callback=downloadProgress, on_complete_callback=lambda stream, path: downloadCompleted(start))
     audio = yt_object.streams.get_audio_only()
     start = time.time()
     audio.download(output_path="G:\\")
@@ -55,10 +54,10 @@ def downloadProgress(stream, chunk, bytes_remaining):
     single_progress_bar.set(percentage/100)
     # single_progress_bar.update()
 
-def downloadCompleted():
+def downloadCompleted(start):
     print("end")
     end = time.time()
-    duration_label.configure(text=f"Last download duration: {start - end}s")
+    duration_label.configure(text=f"Last download duration: {(end - start):.2}s")
     duration_label.update()
 
 
