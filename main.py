@@ -3,38 +3,42 @@ import customtkinter
 from pytube import YouTube
 import pytube.request
 
+
 # Settings
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue")
 pytube.request.default_range_size = 1024 * 1024 * 560 # BYTE
 
-# TODO: fai repository
+# TODO: (opzioni (es. output path) salvate in un file di testo?)
+
 
 # App frame
-app = customtkinter.CTk()
-app.geometry("720x480")
-app.title("MP3 Downloader")
+window = customtkinter.CTk()
+window.geometry("720x480")
+window.title("MP3 Downloader")
+
 
 # Variables
 url = tkinter.StringVar()
 chunk_sizes = ["0.25MB", "0.5MB", "1MB", "9MB"]
 
+
 # Functions
 def updateChunkSize(size):
     chunk_size = 1024 * 1024 * float(size[0:-2])
-    print(chunk_size) # TODO: continua funzione
+    pytube.request.default_range_size = chunk_size
 
 def singleDownload():
-    single_finish_label.configure(text="")
-    single_finish_label.update()
+    download_finish_label.configure(text="")
+    download_finish_label.update()
     try:
-        yt_link = single_link_entry.get()
+        yt_link = download_link_entry.get()
         yt_object = YouTube(yt_link, on_progress_callback=singleProgress)
         audio = yt_object.streams.get_audio_only()
         audio.download(output_path="G:\\") # TODO: rendi settabile
-        single_finish_label.configure(text=f"Downloaded - {yt_object.title}")
+        download_finish_label.configure(text=f"Downloaded - {yt_object.title}")
     except:
-        single_finish_label.configure(text="Invalid link")
+        download_finish_label.configure(text="Invalid link")
 
 def singleProgress(stream, chunk, bytes_remaining):
     total_size = stream.filesize
@@ -46,35 +50,66 @@ def singleProgress(stream, chunk, bytes_remaining):
     single_progress_bar.set(percentage/100)
     # single_progress_bar.update()
 
+
 # UI Elements
+top_frame = customtkinter.CTkFrame(window)
+option_section = customtkinter.CTkFrame(top_frame, corner_radius=0)
+info_section = customtkinter.CTkFrame(top_frame, corner_radius=0)
+main_frame= customtkinter.CTkFrame(window)
+
+# - Options section
+chunk_size_label = customtkinter.CTkLabel(option_section, text="Chunk size:")
 
 # TODO: metti icona "?" che spiega come funziona (consigliato 9MB, ma più è alto ed è bassa la dimensione del file scaricato e più è a scatti la progress bar)
-chunk_size_combobox = customtkinter.CTkComboBox(app, values=chunk_sizes, command=updateChunkSize)
+chunk_size_combobox = customtkinter.CTkComboBox(option_section, values=chunk_sizes, command=updateChunkSize)
 chunk_size_combobox.set("0.5MB")
-chunk_size_combobox.pack()
+
+# - Info section
+duration_label = customtkinter.CTkLabel(info_section, text="Last download duration: 0s") # TODO: metti durata
+
+
+# TODO: metti output path selection
         
-# - signle download
-single_label = customtkinter.CTkLabel(app, text="Single Video URL:")
-single_label.pack(padx=10)
+# - Download section
+download_label = customtkinter.CTkLabel(main_frame, text="Video URL:")
 
-single_link_entry = customtkinter.CTkEntry(app, width=350, textvariable=url) # TODO: eseguire funzione del tasto con Enter
-single_link_entry.pack()
+download_link_entry = customtkinter.CTkEntry(main_frame, width=350, textvariable=url)
 
-single_finish_label = customtkinter.CTkLabel(app, text="")
-single_finish_label.pack()
+download_finish_label = customtkinter.CTkLabel(main_frame, text="")
 
-single_progress_percentage = customtkinter.CTkLabel(app, text="0%")
-single_progress_percentage.pack()
+single_progress_percentage = customtkinter.CTkLabel(main_frame, text="0%")
 
-single_progress_bar = customtkinter.CTkProgressBar(app, width=400)
+single_progress_bar = customtkinter.CTkProgressBar(main_frame, width=400)
 single_progress_bar.set(0)
+
+single_download_button = customtkinter.CTkButton(main_frame, text="Download", command=singleDownload)
+
+
+# Layout
+# - Top
+top_frame.columnconfigure(0, weight=2)
+top_frame.columnconfigure(1, weight=1)
+top_frame.rowconfigure(0, weight=1)
+top_frame.pack(fill="both")
+
+option_section.grid(row=0, column=0, sticky="nw")
+info_section.grid(row=0, column=1, sticky="ne")
+# option_section.pack(side="left", anchor="nw", fill="both", expand=True)
+# info_section.pack(side="right", anchor="ne", fill="both", expand=True)
+
+chunk_size_label.pack(anchor="w")
+chunk_size_combobox.pack(anchor="w")
+
+duration_label.pack(anchor="nw")
+
+# - Main
+main_frame.pack(fill="both", expand=True)
+download_label.pack()
+download_link_entry.pack()
+download_finish_label.pack()
+single_progress_percentage.pack()
 single_progress_bar.pack()
-
-single_download_button = customtkinter.CTkButton(app, text="Download", command=singleDownload)
-single_download_button.pack(pady=10)
-
-# - playlist download
 
 
 # Run App
-app.mainloop()
+window.mainloop()
